@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Malla Interactiva Medicina Veterinaria</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f9f9f9;
+      padding: 20px;
+    }
+    h2 {
+      margin-top: 30px;
+    }
+    .ramo {
+      display: inline-block;
+      padding: 10px 12px;
+      margin: 6px;
+      border-radius: 6px;
+      background-color: #d3d3d3;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .ramo:hover {
+      background-color: #bbb;
+    }
+    .aprobado {
+      background-color: #4caf50;
+      color: white;
+    }
+    .desbloqueado {
+      background-color: #ffd54f;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Malla Interactiva Medicina Veterinaria – UChile</h1>
+  <p>Haz clic en un ramo para marcarlo como aprobado. Se mostrarán los ramos que se desbloquean.</p>
+
+  <!-- Semestres (contenedores vacíos, serán llenados dinámicamente) -->
+  <div id="contenedor-malla"></div>
+
+  <script>
+    const malla = {
+      "Semestre 1": {
+        "bases_moleculares": "Bases moleculares",
+        "info": "Introducción al manejo de la información",
+        "cuantificacion": "Métodos de cuantificación",
+        "ingles1": "Inglés Beginner",
+        "orientacion": "Orientación a la medicina veterinaria",
+        "diversidad": "Diversidad animal"
+      },
+      "Semestre 2": {
+        "molcel": "Bases moleculares y celulares",
+        "celulares": "Bases celulares",
+        "bioestadistica": "Bioestadística",
+        "macro": "Estructura macroscópica del organismo animal",
+        "micro": "Desarrollo y estructura microscópica del organismo animal",
+        "ecologia": "Ecología",
+        "seminario": "Seminario Espacio A",
+        "practica_basica": "Práctica general básica",
+        "ingles2": "Inglés Pre Intermedio"
+      },
+      "Semestre 3": {
+        "fisio1": "Fisiología I",
+        "epidemio": "Epidemiología general",
+        "macro2": "Estructura macroscópica del organismo animal",
+        "micro2": "Desarrollo y estructura microscópica del organismo animal",
+        "economia": "Bases económicas",
+        "conducta": "Conducta animal",
+        "practica_clinica": "Práctica clínica básica",
+        "practica_campo": "Práctica de campo básica"
+      },
+      "Semestre 4": {
+        "inmuno": "Bases inmunológicas",
+        "fisio2": "Fisiología II",
+        "farmaco": "Farmacología general",
+        "agentes": "Agentes biológicos patógenos",
+        "produccion": "Introducción a la producción animal",
+        "economia2": "Bases económicas",
+        "maep": "MAEP",
+        "modulo_basico": "Módulo integrador del ciclo básico"
+      },
+      "Semestre 5": {
+        "enfermedades": "Enfermedades infecciosas y parasitarias",
+        "patologia1": "Patología I",
+        "nutricion": "Nutrición",
+        "diagnostico": "Bases de tecnologías diagnósticas",
+        "maig": "MAIG"
+      },
+      "Semestre 6": {
+        "genetica": "Genética básica",
+        "patologia2": "Patología II",
+        "alimentacion": "Alimentación",
+        "exploracion": "Métodos de exploración clínica",
+        "maat": "MAAT"
+      },
+      "Semestre 7": {
+        "patologia3": "Patología III",
+        "diagnostica": "Patología diagnóstica",
+        "reproduccion": "Reproducción",
+        "biotecnologia": "Biotecnología reproductiva",
+        "medicina1": "Medicina nivel I",
+        "salud_publica": "Salud pública veterinaria",
+        "maca": "MACA"
+      },
+      "Semestre 8": {
+        "gestion": "Gestión ambiental",
+        "inocuidad": "Inocuidad de los alimentos",
+        "manejo": "Manejos productivos",
+        "obstetricia": "Obstetricia y ginecología",
+        "medicina1_2": "Medicina nivel I",
+        "preprofesional": "Práctica pre profesional",
+        "maplan": "MAPLAN",
+        "modulo_profesional": "Módulo integrador ciclo profesional"
+      },
+      "Semestre 9": {
+        "impacto": "Impacto ambiental",
+        "calidad": "Aseguramiento y calidad de los alimentos",
+        "manejo2": "Manejos productivos",
+        "medicina2": "Medicina interna a nivel II",
+        "anestesia": "Anestesiología y cirugía",
+        "explotaciones": "Patología en explotaciones",
+        "mabl": "MABL"
+      },
+      "Semestre 10": {
+        "internado1": "Internado medicina individual",
+        "internado2": "Internado producción animal",
+        "internado3": "Internado medicina preventiva",
+        "profesional": "Práctica profesional",
+        "titulacion": "Taller de titulación"
+      }
+    };
+
+    const dependencias = {
+      molcel: ["bases_moleculares"],
+      celulares: ["bases_moleculares"],
+      bioestadistica: ["info", "cuantificacion"],
+      ecologia: ["diversidad"],
+      fisio1: ["molcel", "celulares"],
+      epidemio: ["bioestadistica"],
+      conducta: ["ecologia"],
+      practica_clinica: ["practica_basica"],
+      practica_campo: ["practica_basica"],
+      inmuno: ["molcel"],
+      fisio2: ["fisio1", "macro"],
+      farmaco: ["fisio1"],
+      agentes: ["molcel", "celulares"],
+      maep: ["ecologia"],
+      modulo_basico: ["molcel", "celulares", "fisio1", "epidemio", "conducta", "macro2", "micro2", "economia", "practica_clinica", "practica_campo"],
+      enfermedades: ["epidemio", "agentes"],
+      patologia1: ["inmuno", "fisio2"],
+      nutricion: ["fisio2", "produccion"],
+      diagnostico: ["inmuno", "agentes"],
+      maig: ["bioestadistica"],
+      genetica: ["maig"],
+      patologia2: ["patologia1"],
+      alimentacion: ["nutricion"],
+      exploracion: ["patologia1", "diagnostico"],
+      maat: ["macro"],
+      patologia3: ["patologia2"],
+      diagnostica: ["patologia2"],
+      reproduccion: ["genetica", "patologia2"],
+      biotecnologia: ["genetica", "patologia2"],
+      medicina1: ["patologia2", "exploracion"],
+      salud_publica: ["enfermedades"],
+      maca: ["produccion", "conducta"],
+      gestion: ["salud_publica"],
+      inocuidad: ["salud_publica"],
+      manejo: ["reproduccion", "alimentacion"],
+      obstetricia: ["reproduccion", "biotecnologia"],
+      medicina1_2: ["patologia2", "exploracion"],
+      maplan: ["economia2"],
+      modulo_profesional: ["medicina1", "salud_publica", "diagnostica", "patologia3", "biotecnologia"],
+      impacto: ["gestion"],
+      calidad: ["inocuidad"],
+      medicina2: ["diagnostica", "medicina1"],
+      anestesia: ["diagnostica", "medicina1"],
+      explotaciones: ["patologia3", "enfermedades"],
+      mabl: ["inocuidad"],
+      internado1: ["medicina2", "anestesia", "explotaciones"],
+      internado2: ["medicina2", "anestesia", "explotaciones"],
+      internado3: ["medicina2", "anestesia", "explotaciones"],
+      profesional: ["medicina2", "anestesia", "explotaciones"],
+      titulacion: ["titulacion"]
+    };
+
+    const estado = {};
+
+    const contenedor = document.getElementById("contenedor-malla");
+
+    for (const [semestre, ramos] of Object.entries(malla)) {
+      const h2 = document.createElement("h2");
+      h2.textContent = semestre;
+      contenedor.appendChild(h2);
+      for (const [id, nombre] of Object.entries(ramos)) {
+        const div = document.createElement("div");
+        div.className = "ramo";
+        div.dataset.id = id;
+        div.textContent = nombre;
+        contenedor.appendChild(div);
+        estado[id] = "pendiente";
+      }
+    }
+
+    const actualizarDesbloqueos = () => {
+      for (let destino in dependencias) {
+        const requisitos = dependencias[destino];
+        const cumplidos = requisitos.every(req => estado[req] === "aprobado");
+        const ramo = document.querySelector(`[data-id="${destino}"]`);
+        if (ramo && estado[destino] !== "aprobado" && cumplidos) {
+          ramo.classList.add("desbloqueado");
+        }
+      }
+    };
+
+    document.querySelectorAll(".ramo").forEach(ramo => {
+      ramo.addEventListener("click", () => {
+        const id = ramo.dataset.id;
+        if (estado[id] === "aprobado") return;
+        estado[id] = "aprobado";
+        ramo.classList.add("aprobado");
+        actualizarDesbloqueos();
+      });
+    });
+  </script>
+
+</body>
+</html>
